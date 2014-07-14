@@ -1,0 +1,61 @@
+
+<!--
+  Nested CSS requests don't get applied to the parent document,
+  so we're using the `proto.requestFont` hack
+-->
+
+<!-- <link rel="stylesheet" href="../bower_components/gaia-icons/style.css" /> -->
+
+<template id="template">
+  <style>
+    .icon:after {
+      font-family:"gaia-icons";
+      text-rendering: optimizeLegibility;
+      font-weight: normal;
+    }
+
+    h1 {
+      color: red;
+    }
+
+    h1:after {
+      content: 'camera';
+      color: red;
+    }
+
+    .content p {
+      color: green;
+    }
+  </style>
+  <h1 class="icon">shadow-dom</h1>
+  <content select="p"></content>
+</template>
+
+<script>
+var proto = Object.create(HTMLElement.prototype);
+var thisDoc = document.currentScript.ownerDocument;
+var template = thisDoc.getElementById('template');
+
+proto.createdCallback = function() {
+  var root = this.createShadowRoot();
+  var html = template.content.cloneNode(true);
+  var style = html.querySelector('style').cloneNode(true);
+
+  root.appendChild(html);
+  this.classList.add('content', 'host');
+  style.setAttribute('scoped', '');
+  this.appendChild(style);
+  this.requestFont();
+};
+
+proto.requestFont = function() {
+  if (document.getElementById('gaia-icons')) return;
+  var link = document.createElement('link');
+  link.href = 'bower_components/gaia-icons/style.css';
+  link.rel = 'stylesheet';
+  link.id = 'gaia-icons';
+  document.head.appendChild(link);
+};
+
+document.registerElement('my-element', { prototype: proto });
+</script>

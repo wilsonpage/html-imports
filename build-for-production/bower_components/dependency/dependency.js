@@ -1,0 +1,1 @@
+alert('dependency loaded');
